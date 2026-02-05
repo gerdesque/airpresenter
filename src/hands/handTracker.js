@@ -25,7 +25,7 @@ export async function createHandTracker({
     throw new Error("videoEl und canvasEl sind erforderlich.");
   }
 
-  onStatus?.("Loading MediaPipe…");
+  onStatus?.("MediaPipe wird geladen...");
   const vision = await FilesetResolver.forVisionTasks(cfg.wasmBaseUrl);
 
   const landmarker = await HandLandmarker.createFromOptions(vision, {
@@ -44,7 +44,7 @@ export async function createHandTracker({
   let running = false;
 
   async function initCamera() {
-    onStatus?.("Requesting camera…");
+    onStatus?.("Kamera wird angefragt...");
     stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: "user" },
       audio: false,
@@ -54,7 +54,7 @@ export async function createHandTracker({
 
     canvasEl.width = videoEl.videoWidth;
     canvasEl.height = videoEl.videoHeight;
-    onStatus?.("Handtracking läuft");
+    onStatus?.("Handtracking aktiv");
   }
 
   function loop() {
@@ -94,3 +94,4 @@ export async function createHandTracker({
     },
   };
 }
+

@@ -17,13 +17,17 @@ export function createPointerOverlay({
 
   function setActive(v) {
     active = v;
-    if (!active) clear();
+    if (!active) {
+      clear();
+      return;
+    }
+    cur.x = target.x;
+    cur.y = target.y;
   }
 
   function setTargetNorm(x, y) {
     target.x = Math.max(0, Math.min(1, x));
     target.y = Math.max(0, Math.min(1, y));
-    console.log(target.x, target.y);
   }
 
   function clear() {
@@ -79,7 +83,6 @@ export function createPointerOverlay({
 
 
   function start() {
-    console.log("start");
     requestAnimationFrame(tick);
   }
 

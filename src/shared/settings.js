@@ -19,5 +19,5 @@ export const DEFAULTS = {
 
   // Pointer visuals
   pointerRadiusPx: 10,
-  pointerSmoothing: 0.35
+  pointerSmoothing: 0.22
 };
