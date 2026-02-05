@@ -1,0 +1,18 @@
+# AirPresenter – Day 3 (PDF)
+
+Web-basierte Touchless-Präsentation (PDF) + Handtracking (MediaPipe) + Gesture Engine.
+
+## Quickstart
+```bash
+npm i
+npm run dev
+```
+
+## Bedienung (MVP)
+- **Tap (Pinch kurz):** nächste Seite
+- **Double Tap:** vorige Seite
+- **Pinch-Hold + Drag:** Laserpointer bewegen (Overlay)
+- Tastatur-Fallback: **←/→** und **Space**
+
+## Privacy
+Video bleibt lokal im Browser. Es wird nichts hochgeladen (sofern du es nicht selbst implementierst).

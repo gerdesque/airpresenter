@@ -1,0 +1,242 @@
+/* AirPresenter – Spin-the-Shark inspired look & feel (overlay UI, big stage, minimal chrome) */
+
+:root{
+  --bg: #07080c;
+  --panel: rgba(20, 24, 34, 0.78);
+  --panelBorder: rgba(255,255,255,0.12);
+  --text: rgba(255,255,255,0.92);
+  --muted: rgba(255,255,255,0.70);
+  --muted2: rgba(255,255,255,0.55);
+  --accent: rgba(255,255,255,0.92);
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+html, body { height: 100%; }
+body{
+  margin:0;
+  background: radial-gradient(1200px 800px at 50% 30%, rgba(40,48,80,0.25), transparent 60%),
+              radial-gradient(900px 600px at 15% 15%, rgba(255,255,255,0.08), transparent 60%),
+              var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+
+#app { height: 100%; }
+
+.stage{
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Main content (PDF) */
+.viewer{
+  position: absolute;
+  inset: 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.viewer canvas{
+  width: 100%;
+  height: 100%;
+  display:block;
+}
+
+#pdfCanvas{
+  position:absolute;
+  inset:0;
+}
+
+#pointerCanvas{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+
+/* Top overlay */
+.topbar{
+  position:absolute;
+  left: 14px;
+  right: 14px;
+  top: 14px;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  pointer-events:none;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--panel);
+  border: 1px solid var(--panelBorder);
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+  pointer-events:auto;
+}
+
+.brandTitle{
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.pill{
+  padding: 8px 10px;
+  background: var(--panel);
+  border: 1px solid var(--panelBorder);
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  font-size: 12px;
+  color: var(--muted);
+  pointer-events:auto;
+}
+
+/* Big instruction hint (like SpinTheShark) */
+.hint{
+  position:absolute;
+  left: 50%;
+  top: 56%;
+  transform: translate(-50%, -50%);
+  text-align:center;
+  width: min(680px, 92vw);
+  pointer-events:none;
+}
+.hint h2{
+  margin:0 0 8px 0;
+  font-size: clamp(18px, 3.2vw, 28px);
+  letter-spacing: 0.2px;
+}
+.hint p{
+  margin:0;
+  color: var(--muted);
+  font-size: clamp(12px, 1.8vw, 14px);
+}
+
+/* Camera PiP */
+.pip{
+  position:absolute;
+  right: 14px;
+  bottom: 14px;
+  width: min(360px, 44vw);
+  aspect-ratio: 4/3;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--panelBorder);
+  border-radius: 16px;
+  overflow:hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+}
+
+.pip video, .pip canvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+.pipLabel{
+  position:absolute;
+  left: 10px;
+  bottom: 10px;
+  padding: 6px 8px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--muted);
+  backdrop-filter: blur(8px);
+}
+
+/* Settings button + drawer */
+.iconBtn{
+  height: 36px;
+  width: 36px;
+  display:grid;
+  place-items:center;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.18);
+  cursor:pointer;
+}
+.iconBtn:hover{ background: rgba(255,255,255,0.06); }
+.iconBtn:active{ transform: translateY(1px); }
+
+.drawer{
+  position:absolute;
+  left: 14px;
+  top: 64px;
+  width: min(420px, 92vw);
+  background: var(--panel);
+  border: 1px solid var(--panelBorder);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+  padding: 12px;
+  display:none;
+  pointer-events:auto;
+}
+
+.drawer.open{ display:block; }
+
+.drawer h3{
+  margin: 0 0 10px 0;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.row{ display:flex; gap: 10px; flex-wrap: wrap; align-items:center; }
+
+button, input[type="file"]::file-selector-button {
+  background: rgba(255,255,255,0.07);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-size: 13px;
+  cursor:pointer;
+}
+button:disabled{ opacity: 0.45; cursor:not-allowed; }
+
+input[type="range"]{ width: 100%; }
+
+.kv{
+  display:grid;
+  grid-template-columns: 140px 1fr;
+  gap: 10px;
+  align-items:center;
+  margin-top: 10px;
+}
+.kv label{ font-size: 12px; color: var(--muted); }
+.kv .v{ font-size: 12px; color: var(--muted2); text-align:right; }
+
+hr{
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  margin: 12px 0;
+}
+
+.debug{
+  margin-top: 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.75);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+kbd{
+  padding: 2px 6px;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-bottom-width: 2px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.25);
+  font-size: 12px;
+  color: var(--muted);
+}

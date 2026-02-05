@@ -8,6 +8,10 @@
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "^0.10.10",
+    "pdfjs-dist": "^4.10.38"
+  },
   "devDependencies": {
     "typescript": "~5.9.3",
     "vite": "^7.2.4"
