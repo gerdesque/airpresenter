@@ -4,8 +4,17 @@ import { createHandTracker } from "./hands/handTracker.js";
 import { createGestureEngine } from "./gestures/gestureEngine.js";
 import { createPdfViewer } from "./pdf/pdfViewer.js";
 import { createPointerOverlay } from "./pdf/pointerOverlay.js";
+import type { HandFrame } from "./hands/handTracker.js";
+import type { GestureConfig, GestureEvent } from "./gestures/gestureEngine.js";
+import type { PdfState } from "./pdf/pdfViewer.js";
 
-const app = document.querySelector("#app");
+const getEl = <T extends Element>(selector: string): T => {
+  const el = document.querySelector<T>(selector);
+  if (!el) throw new Error(`Missing element: ${selector}`);
+  return el;
+};
+
+const app = getEl<HTMLDivElement>("#app");
 
 app.innerHTML = `
   <div class="stage">
@@ -25,13 +34,13 @@ app.innerHTML = `
         <div>
           <div class="brandTitle">AirPresenter</div>
           <div class="small" style="color:rgba(255,255,255,0.68);font-size:12px;">
-            Tap=Next · DoubleTap=Prev · Hold+Drag=Pointer
+            Tap=Next - DoubleTap=Prev - Hold+Drag=Pointer
           </div>
         </div>
       </div>
 
       <div class="pill" id="pagePill">No PDF loaded</div>
-      <div class="pill" id="statusPill">Init…</div>
+      <div class="pill" id="statusPill">Init...</div>
     </div>
 
     <div class="drawer" id="drawer" aria-label="Settings panel">
@@ -43,7 +52,7 @@ app.innerHTML = `
       </div>
 
       <div style="margin-top:10px;color:rgba(255,255,255,0.62);font-size:12px;">
-        Keyboard fallback: <kbd>→</kbd> / <kbd>←</kbd> / <kbd>Space</kbd>
+        Keyboard fallback: <kbd>-&gt;</kbd> / <kbd>&lt;-</kbd> / <kbd>Space</kbd>
       </div>
 
       <hr/>
@@ -96,31 +105,32 @@ app.innerHTML = `
   </div>
 `;
 
-const statusPill = document.querySelector("#statusPill");
-const pagePill = document.querySelector("#pagePill");
-const hintEl = document.querySelector("#hint");
+const statusPill = getEl<HTMLDivElement>("#statusPill");
+const pagePill = getEl<HTMLDivElement>("#pagePill");
+const hintEl = getEl<HTMLDivElement>("#hint");
 
-const pdfCanvasEl = document.querySelector("#pdfCanvas");
-const pointerCanvasEl = document.querySelector("#pointerCanvas");
+const pdfCanvasEl = getEl<HTMLCanvasElement>("#pdfCanvas");
+const pointerCanvasEl = getEl<HTMLCanvasElement>("#pointerCanvas");
 
-const videoEl = document.querySelector("#video");
-const handsCanvasEl = document.querySelector("#handsCanvas");
+const videoEl = getEl<HTMLVideoElement>("#video");
+const handsCanvasEl = getEl<HTMLCanvasElement>("#handsCanvas");
 
-const drawer = document.querySelector("#drawer");
-const settingsBtn = document.querySelector("#settingsBtn");
+const drawer = getEl<HTMLDivElement>("#drawer");
+const settingsBtn = getEl<HTMLButtonElement>("#settingsBtn");
 
-const fileEl = document.querySelector("#file");
-const prevBtn = document.querySelector("#prev");
-const nextBtn = document.querySelector("#next");
-const debugEl = document.querySelector("#debug");
+const fileEl = getEl<HTMLInputElement>("#file");
+const prevBtn = getEl<HTMLButtonElement>("#prev");
+const nextBtn = getEl<HTMLButtonElement>("#next");
+const debugEl = getEl<HTMLDivElement>("#debug");
 
 settingsBtn.addEventListener("click", () => drawer.classList.toggle("open"));
-window.addEventListener("keydown", (e) => { if (e.key === "Escape") drawer.classList.remove("open"); });
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") drawer.classList.remove("open");
+});
 
-// PDF viewer + pointer
 const pdf = createPdfViewer({
   canvasEl: pdfCanvasEl,
-  onState: (s) => {
+  onState: (s: PdfState) => {
     if (!s.loaded) {
       pagePill.textContent = "No PDF loaded";
       prevBtn.disabled = true;
@@ -143,24 +153,31 @@ const pointer = createPointerOverlay({
 });
 pointer.start();
 
-prevBtn.addEventListener("click", () => pdf.prev());
-nextBtn.addEventListener("click", () => pdf.next());
+prevBtn.addEventListener("click", () => {
+  void pdf.prev();
+});
+nextBtn.addEventListener("click", () => {
+  void pdf.next();
+});
 window.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowRight" || e.key === " ") pdf.next();
-  if (e.key === "ArrowLeft") pdf.prev();
+  if (e.key === "ArrowRight" || e.key === " ") void pdf.next();
+  if (e.key === "ArrowLeft") void pdf.prev();
 });
 
 fileEl.addEventListener("change", async (e) => {
-  const file = e.target.files?.[0];
+  const input = e.currentTarget as HTMLInputElement;
+  const file = input.files?.[0];
   if (!file) return;
-  if (file.type !== "application/pdf") return alert("Bitte eine PDF wählen.");
-  statusPill.textContent = "Loading PDF…";
+  if (file.type !== "application/pdf") {
+    alert("Bitte eine PDF waehlen.");
+    return;
+  }
+  statusPill.textContent = "Loading PDF...";
   await pdf.loadFromFile(file);
   statusPill.textContent = "Ready";
 });
 
-// Tuning UI
-const tuning = {
+const tuning: GestureConfig = {
   pinchThresholdDown: DEFAULTS.pinchThresholdDown,
   pinchThresholdUp: DEFAULTS.pinchThresholdUp,
   pinchDownFrames: DEFAULTS.pinchDownFrames,
@@ -172,17 +189,17 @@ const tuning = {
   maxTapDurationMs: DEFAULTS.maxTapDurationMs,
 };
 
-const pinchDownEl = document.querySelector("#pinchDown");
-const pinchUpEl = document.querySelector("#pinchUp");
-const holdEl = document.querySelector("#hold");
-const cooldownEl = document.querySelector("#cooldown");
-const deadzoneEl = document.querySelector("#deadzone");
+const pinchDownEl = getEl<HTMLInputElement>("#pinchDown");
+const pinchUpEl = getEl<HTMLInputElement>("#pinchUp");
+const holdEl = getEl<HTMLInputElement>("#hold");
+const cooldownEl = getEl<HTMLInputElement>("#cooldown");
+const deadzoneEl = getEl<HTMLInputElement>("#deadzone");
 
-const pinchDownV = document.querySelector("#pinchDownV");
-const pinchUpV = document.querySelector("#pinchUpV");
-const holdV = document.querySelector("#holdV");
-const cooldownV = document.querySelector("#cooldownV");
-const deadzoneV = document.querySelector("#deadzoneV");
+const pinchDownV = getEl<HTMLDivElement>("#pinchDownV");
+const pinchUpV = getEl<HTMLDivElement>("#pinchUpV");
+const holdV = getEl<HTMLDivElement>("#holdV");
+const cooldownV = getEl<HTMLDivElement>("#cooldownV");
+const deadzoneV = getEl<HTMLDivElement>("#deadzoneV");
 
 function syncUI() {
   pinchDownEl.value = String(tuning.pinchThresholdDown);
@@ -199,10 +216,9 @@ function syncUI() {
 }
 syncUI();
 
-// Gesture engine + mapping
 const gestures = createGestureEngine({
   ...tuning,
-  onEvent: async (evt) => {
+  onEvent: async (evt: GestureEvent) => {
     debugEl.textContent = JSON.stringify(evt, null, 2);
 
     const st = pdf.getState();
@@ -230,11 +246,14 @@ const gestures = createGestureEngine({
   },
 });
 
-function attach(slider, key, cast) {
+function attachSlider<K extends keyof GestureConfig>(
+  slider: HTMLInputElement,
+  key: K,
+  cast: (value: string) => GestureConfig[K],
+) {
   slider.addEventListener("input", () => {
     tuning[key] = cast(slider.value);
 
-    // keep pinchUp >= pinchDown + margin
     const margin = 0.008;
     if (tuning.pinchThresholdUp < tuning.pinchThresholdDown + margin) {
       tuning.pinchThresholdUp = Math.min(0.09, tuning.pinchThresholdDown + margin);
@@ -245,17 +264,19 @@ function attach(slider, key, cast) {
   });
 }
 
-attach(pinchDownEl, "pinchThresholdDown", Number);
-attach(pinchUpEl, "pinchThresholdUp", Number);
-attach(holdEl, "holdMs", Number);
-attach(cooldownEl, "tapCooldownMs", Number);
-attach(deadzoneEl, "dragDeadzone", Number);
+attachSlider(pinchDownEl, "pinchThresholdDown", Number);
+attachSlider(pinchUpEl, "pinchThresholdUp", Number);
+attachSlider(holdEl, "holdMs", Number);
+attachSlider(cooldownEl, "tapCooldownMs", Number);
+attachSlider(deadzoneEl, "dragDeadzone", Number);
 
-// Hand tracker
 const tracker = await createHandTracker({
   videoEl,
   canvasEl: handsCanvasEl,
-  onFrame: (frame) => gestures.update(frame),
-  onStatus: (txt) => (statusPill.textContent = txt),
+  onFrame: (frame: HandFrame) => gestures.update(frame),
+  onStatus: (txt: string) => {
+    statusPill.textContent = txt;
+  },
 });
+
 tracker.start();
