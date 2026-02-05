@@ -21,6 +21,7 @@ app.innerHTML = `
     <div class="viewer">
       <canvas id="pdfCanvas"></canvas>
       <canvas id="pointerCanvas"></canvas>
+      <div class="fx-layer" id="fxLayer" aria-hidden="true"></div>
       <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="PDF ablegen oder auswaehlen">
         <div class="dropTitle">PDF ablegen</div>
         <div class="dropHint">oder klicken zum Auswaehlen</div>
@@ -38,7 +39,7 @@ app.innerHTML = `
         <div>
           <div class="brandTitle">AirPresenter</div>
           <div class="small" style="color:rgba(255,255,255,0.68);font-size:12px;">
-            Tippen=Weiter - Doppeltippen=Zurueck - Halten+Ziehen=Laser
+            Tippen=Weiter - Doppeltippen=Zurueck - Halten+Ziehen=Laser - Herz/Confetti/Peace/Rock
           </div>
         </div>
       </div>
@@ -98,7 +99,7 @@ app.innerHTML = `
 
     <div class="hint" id="hint">
       <h2>Kamera aktivieren und gut sichtbar sein</h2>
-      <p>Einstellungen oeffnen, PDF laden. Dann: Pinch-Tippen fuer weiter, Doppeltippen fuer zurueck, Pinch-Halten und bewegen fuer den Laser.</p>
+      <p>Einstellungen oeffnen, PDF laden. Dann: Pinch-Tippen fuer weiter, Doppeltippen fuer zurueck, Pinch-Halten und bewegen fuer den Laser. Fun: Herz, offene Hand (Confetti), Peace und Rock.</p>
     </div>
 
     <div class="camera-orb" id="cameraOrb" aria-label="Kamera-Vorschau">
@@ -118,6 +119,7 @@ const dropzoneEl = getEl<HTMLDivElement>("#dropzone");
 
 const pdfCanvasEl = getEl<HTMLCanvasElement>("#pdfCanvas");
 const pointerCanvasEl = getEl<HTMLCanvasElement>("#pointerCanvas");
+const fxLayerEl = getEl<HTMLDivElement>("#fxLayer");
 
 const videoEl = getEl<HTMLVideoElement>("#video");
 const handsCanvasEl = getEl<HTMLCanvasElement>("#handsCanvas");
@@ -163,6 +165,64 @@ const pointer = createPointerOverlay({
   smoothing: DEFAULTS.pointerSmoothing,
 });
 pointer.start();
+
+function getFxPosition(nx?: number | null, ny?: number | null) {
+  const rect = fxLayerEl.getBoundingClientRect();
+  const x = (nx ?? 0.5) * rect.width;
+  const y = (ny ?? 0.5) * rect.height;
+  return { x, y };
+}
+
+function spawnFxNode(className: string, x: number, y: number, style: Record<string, string> = {}) {
+  const node = document.createElement("div");
+  node.className = className;
+  node.style.left = `${x}px`;
+  node.style.top = `${y}px`;
+  Object.entries(style).forEach(([key, value]) => node.style.setProperty(key, value));
+  fxLayerEl.appendChild(node);
+  return node;
+}
+
+function spawnHeart(nx?: number | null, ny?: number | null) {
+  const { x, y } = getFxPosition(nx, ny);
+  const node = spawnFxNode("fx-heart", x, y);
+  setTimeout(() => node.remove(), 900);
+}
+
+function spawnSparkBurst(nx?: number | null, ny?: number | null, hue = 46) {
+  const { x, y } = getFxPosition(nx, ny);
+  const count = 12;
+  for (let i = 0; i < count; i += 1) {
+    const angle = (Math.PI * 2 * i) / count;
+    const dist = 240 + Math.random() * 260;
+    const dx = Math.cos(angle) * dist;
+    const dy = Math.sin(angle) * dist;
+    const node = spawnFxNode("fx-spark", x, y, {
+      "--dx": `${dx}px`,
+      "--dy": `${dy}px`,
+      "--hue": String(hue + Math.floor(Math.random() * 25)),
+    });
+    setTimeout(() => node.remove(), 900);
+  }
+}
+
+function spawnConfetti(nx?: number | null, ny?: number | null) {
+  const { x, y } = getFxPosition(nx, ny);
+  const count = 50;
+  for (let i = 0; i < count; i += 1) {
+    const angle = (Math.random() * Math.PI) - Math.PI / 2;
+    const spread = 420 + Math.random() * 360;
+    const dx = Math.cos(angle) * spread;
+    const dy = Math.sin(angle) * spread + 220;
+    const node = spawnFxNode("fx-confetti", x, y, {
+      "--dx": `${dx}px`,
+      "--dy": `${dy}px`,
+      "--rot": `${Math.random() * 260 - 130}deg`,
+      "--hue": String(Math.floor(Math.random() * 360)),
+    });
+    setTimeout(() => node.remove(), 1200);
+  }
+}
 
 prevBtn.addEventListener("click", () => {
   void pdf.prev();
@@ -300,6 +360,18 @@ const gestures = createGestureEngine({
       case "drag":
       case "holding":
         if (evt.x != null && evt.y != null) pointer.setTargetNorm(evt.x, evt.y);
+        break;
+      case "heart":
+        spawnHeart(evt.x, evt.y);
+        break;
+      case "confetti":
+        spawnConfetti(evt.x, evt.y);
+        break;
+      case "peace":
+        spawnSparkBurst(evt.x, evt.y, 180);
+        break;
+      case "rock_on":
+        spawnSparkBurst(evt.x, evt.y, 12);
         break;
     }
   },

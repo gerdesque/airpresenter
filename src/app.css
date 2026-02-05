@@ -56,6 +56,82 @@ body{
   pointer-events:none;
 }
 
+.fx-layer{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index: 3;
+  overflow:hidden;
+}
+
+.fx-heart{
+  position:absolute;
+  width: 160px;
+  height: 160px;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  background: linear-gradient(135deg, rgba(255,70,120,0.95), rgba(255,110,160,0.95));
+  border-radius: 14px 0 8px 0;
+  box-shadow: 0 24px 70px rgba(255, 60, 110, 0.35);
+  animation: heart-pop 0.9s ease-out forwards;
+}
+.fx-heart::before,
+.fx-heart::after{
+  content:"";
+  position:absolute;
+  width: 160px;
+  height: 160px;
+  background: inherit;
+  border-radius: 50%;
+}
+.fx-heart::before{
+  top: -80px;
+  left: 0;
+}
+.fx-heart::after{
+  left: 80px;
+  top: 0;
+}
+
+.fx-confetti{
+  position:absolute;
+  width: 22px;
+  height: 12px;
+  border-radius: 3px;
+  background: hsl(var(--hue) 90% 60%);
+  transform: translate(-50%, -50%) rotate(var(--rot));
+  animation: confetti-fall 1.2s ease-out forwards;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.25);
+}
+
+.fx-spark{
+  position:absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: hsl(var(--hue) 90% 60%);
+  transform: translate(-50%, -50%);
+  animation: spark-fly 0.9s ease-out forwards;
+  box-shadow: 0 0 22px rgba(255,255,255,0.5);
+}
+
+@keyframes heart-pop{
+  0%{ transform: translate(-50%, -50%) rotate(-45deg) scale(0.4); opacity: 0; }
+  35%{ transform: translate(-50%, -50%) rotate(-45deg) scale(1.05); opacity: 1; }
+  100%{ transform: translate(-50%, -70%) rotate(-45deg) scale(0.9); opacity: 0; }
+}
+
+@keyframes confetti-fall{
+  0%{ transform: translate(-50%, -50%) rotate(var(--rot)); opacity: 0; }
+  15%{ opacity: 1; }
+  100%{ transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(calc(var(--rot) * 2)); opacity: 0; }
+}
+
+@keyframes spark-fly{
+  0%{ transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
+  20%{ opacity: 1; }
+  100%{ transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.3); opacity: 0; }
+}
+
 /* Drag & drop */
 .dropzone{
   position:absolute;

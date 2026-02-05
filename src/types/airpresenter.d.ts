@@ -126,6 +126,10 @@ declare module "./gestures/gestureEngine.js" {
     | { type: "hold_start"; t: number }
     | { type: "hold_end"; t: number }
     | { type: "hand_lost"; t: number; from?: string }
+    | { type: "confetti"; t: number; x?: number; y?: number }
+    | { type: "heart"; t: number; x?: number; y?: number }
+    | { type: "peace"; t: number; x?: number; y?: number }
+    | { type: "rock_on"; t: number; x?: number; y?: number }
     | { type: "drag" | "holding"; t: number; x?: number | null; y?: number | null; dx?: number; dy?: number };
 
   export type GestureEngineOptions = GestureConfig & {
