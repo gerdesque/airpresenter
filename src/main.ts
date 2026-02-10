@@ -22,9 +22,9 @@ app.innerHTML = `
       <canvas id="pdfCanvas"></canvas>
       <canvas id="pointerCanvas"></canvas>
       <div class="fx-layer" id="fxLayer" aria-hidden="true"></div>
-      <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="PDF ablegen oder auswaehlen">
+      <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="PDF ablegen oder auswählen">
         <div class="dropTitle">PDF ablegen</div>
-        <div class="dropHint">oder klicken zum Auswaehlen</div>
+        <div class="dropHint">oder klicken zum Auswählen</div>
       </div>
     </div>
 
@@ -39,7 +39,7 @@ app.innerHTML = `
         <div>
           <div class="brandTitle">AirPresenter</div>
           <div class="small" style="color:rgba(255,255,255,0.68);font-size:12px;">
-            Tippen=Weiter - Doppeltippen=Zurueck - Halten+Ziehen=Laser - Herz/Confetti/Peace/Rock
+            Tippen=Weiter - Doppeltippen=Zurück - Halten+Ziehen=Laser - Herz/Confetti/Peace/Rock
           </div>
         </div>
       </div>
@@ -52,7 +52,7 @@ app.innerHTML = `
       <h3>Einstellungen</h3>
       <div class="row">
         <input id="file" type="file" accept="application/pdf" />
-        <button id="prev" disabled>Zurueck</button>
+        <button id="prev" disabled>Zurück</button>
         <button id="next" disabled>Weiter</button>
       </div>
 
@@ -62,7 +62,7 @@ app.innerHTML = `
 
       <hr/>
 
-      <h3>Gesten-Feintuning (praesentationssicher)</h3>
+      <h3>Gesten-Feintuning</h3>
 
       <div class="kv">
         <label for="pinchDown">Pinch-Start</label>
@@ -98,15 +98,13 @@ app.innerHTML = `
     </div>
 
     <div class="hint" id="hint">
-      <h2>Kamera aktivieren und gut sichtbar sein</h2>
-      <p>Einstellungen oeffnen, PDF laden. Dann: Pinch-Tippen fuer weiter, Doppeltippen fuer zurueck, Pinch-Halten und bewegen fuer den Laser. Fun: Herz, offene Hand (Confetti), Peace und Rock.</p>
     </div>
 
     <div class="camera-orb" id="cameraOrb" aria-label="Kamera-Vorschau">
       <div class="camera-blur" aria-hidden="true"></div>
       <video id="video" playsinline muted></video>
       <canvas id="handsCanvas"></canvas>
-      <div class="cameraLabel" id="cameraLabel">Kamera aus</div>
+      <!--div class="cameraLabel" id="cameraLabel">Kamera aus</div-->
     </div>
   </div>
 `;
@@ -124,7 +122,7 @@ const fxLayerEl = getEl<HTMLDivElement>("#fxLayer");
 const videoEl = getEl<HTMLVideoElement>("#video");
 const handsCanvasEl = getEl<HTMLCanvasElement>("#handsCanvas");
 const cameraOrbEl = getEl<HTMLDivElement>("#cameraOrb");
-const cameraLabelEl = getEl<HTMLDivElement>("#cameraLabel");
+//const cameraLabelEl = getEl<HTMLDivElement>("#cameraLabel");
 
 const drawer = getEl<HTMLDivElement>("#drawer");
 const settingsBtn = getEl<HTMLButtonElement>("#settingsBtn");
@@ -364,11 +362,8 @@ const gestures = createGestureEngine({
       case "heart":
         spawnHeart(evt.x, evt.y);
         break;
-      case "confetti":
-        spawnConfetti(evt.x, evt.y);
-        break;
       case "peace":
-        spawnSparkBurst(evt.x, evt.y, 180);
+        spawnConfetti(evt.x, evt.y);
         break;
       case "rock_on":
         spawnSparkBurst(evt.x, evt.y, 12);
@@ -412,4 +407,4 @@ const tracker = await createHandTracker({
 
 await tracker.start();
 cameraOrbEl.classList.add("is-active");
-cameraLabelEl.textContent = "Kamera aktiv";
+//cameraLabelEl.textContent = "Kamera aktiv";
