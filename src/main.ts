@@ -272,6 +272,7 @@ window.addEventListener("dragenter", (e) => {
 window.addEventListener("dragover", (e) => {
   if (!isFileDrag(e)) return;
   e.preventDefault();
+  if (!e.dataTransfer) return;
   e.dataTransfer.dropEffect = "copy";
 });
 window.addEventListener("dragleave", () => {
