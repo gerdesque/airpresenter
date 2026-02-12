@@ -39,7 +39,7 @@ app.innerHTML = `
         <div>
           <div class="brandTitle">AirPresenter</div>
           <div class="small" style="color:rgba(255,255,255,0.68);font-size:12px;">
-            Tippen=Weiter - Doppeltippen=Zurück - Halten+Ziehen=Laser - Herz/Confetti/Peace/Rock
+            Tippen=Weiter - Doppeltippen=Zurück - Halten+Ziehen=Laser - ❤️/✌️/🤘︎
           </div>
         </div>
       </div>
@@ -358,7 +358,7 @@ const gestures = createGestureEngine({
         break;
       case "drag":
       case "holding":
-        if (evt.x != null && evt.y != null) pointer.setTargetNorm(evt.x, evt.y);
+        if (evt.x != null && evt.y != null) pointer.setTargetNorm(1 - evt.x, evt.y);
         break;
       case "heart":
         spawnHeart(evt.x, evt.y);
