@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AirPresenter Fist Scroll</title>
+    <link rel="icon" type="image/png" href="./icons/icon32.png" />
+    <link rel="stylesheet" href="./controller.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="head">
+        <img class="brand-mark" src="./icons/icon48.png" alt="AirPresenter" width="48" height="48" />
+        <div class="brand-copy">
+          <h1>AirPresenter</h1>
+          <p>Control the active tab with a vertical fist motion.</p>
+        </div>
+      </header>
+
+      <section class="controls">
+        <button id="startBtn" type="button">Start</button>
+        <button id="stopBtn" type="button" disabled>Stop</button>
+      </section>
+
+      <section class="panel">
+        <video id="video" autoplay playsinline muted></video>
+        <canvas id="overlay"></canvas>
+      </section>
+
+      <footer class="meta">
+        <div id="status">Idle</div>
+        <div id="event">No gesture yet</div>
+        <pre id="diag" class="diag"></pre>
+      </footer>
+    </main>
+
+    <script type="module" src="./controller.js"></script>
+  </body>
+</html>

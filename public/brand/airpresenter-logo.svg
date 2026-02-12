@@ -1,0 +1,22 @@
+<svg width="980" height="260" viewBox="0 0 980 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">AirPresenter neon logo</title>
+  <desc id="desc">Vivid neon AirPresenter logo for bold visual presence.</desc>
+  <defs>
+    <linearGradient id="bg" x1="22" y1="22" x2="212" y2="212" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF4A7D"/>
+      <stop offset="0.48" stop-color="#7A47FF"/>
+      <stop offset="1" stop-color="#31E1FF"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(12 14)">
+    <rect x="8" y="8" width="204" height="204" rx="52" fill="url(#bg)"/>
+    <rect x="8" y="8" width="204" height="204" rx="52" fill="#FFFFFF" opacity="0.1"/>
+    <path d="M62 138L104 76L147 138" fill="none" stroke="#FFFFFF" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M143 102H180" stroke="#D9F8FF" stroke-width="13" stroke-linecap="round"/>
+    <circle cx="170" cy="73" r="10" fill="#D9F8FF"/>
+  </g>
+  <g transform="translate(258 45)">
+    <text x="0" y="92" font-family="Sora, Segoe UI, sans-serif" font-size="94" font-weight="800" fill="#1A1142">AirPresenter</text>
+    <text x="2" y="146" font-family="Sora, Segoe UI, sans-serif" font-size="31" font-weight="700" fill="#4F3FA8" letter-spacing="4.2">MOTION-DRIVEN CONTROL</text>
+  </g>
+</svg>

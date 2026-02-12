@@ -44,6 +44,38 @@ npm run dev
 - `npm run dev`: start development server
 - `npm run build`: typecheck and build
 - `npm run preview`: preview production build
+- `npm run build:extension`: build Chrome extension to `dist-extension`
+
+## Chrome Extension (URL Fist Scroll)
+The repo includes a Manifest V3 extension under `extension/`.
+
+1. Build it:
+```bash
+npm run build:extension
+```
+2. Open `chrome://extensions`.
+3. Enable `Developer mode`.
+4. Click `Load unpacked` and select `dist-extension`.
+5. Click the extension icon, press `Start`, allow camera access, then move a fist up/down to scroll the active tab.
+
+Notes:
+- Restricted pages (e.g. `chrome://*`) cannot be controlled.
+- This extension scrolls the active tab directly and does not use iframe embedding.
+- MediaPipe WASM files are copied locally during `build:extension` to satisfy extension CSP (`script-src 'self'`).
+
+## Branding Variants
+- Generate active default icons:
+```bash
+node scripts/generate-extension-icons.mjs
+```
+- Generate all icon variants (`beam`, `minimal`, `neon`):
+```bash
+node scripts/generate-extension-icons.mjs --all
+```
+- Variant outputs:
+  - `extension/public/icons/variants/beam`
+  - `extension/public/icons/variants/minimal`
+  - `extension/public/icons/variants/neon`
 
 ## Privacy
 Camera video stays local in the browser. Nothing is uploaded unless you add your own backend or telemetry.

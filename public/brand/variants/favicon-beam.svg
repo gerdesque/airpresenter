@@ -1,0 +1,21 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">AirPresenter beam favicon</title>
+  <desc id="desc">Luminous beam-style AirPresenter favicon.</desc>
+  <defs>
+    <linearGradient id="bg" x1="22" y1="18" x2="234" y2="236" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#073BFF"/>
+      <stop offset="0.42" stop-color="#00AFFF"/>
+      <stop offset="1" stop-color="#6BFFD7"/>
+    </linearGradient>
+    <radialGradient id="beam" cx="0.52" cy="0.48" r="0.8">
+      <stop offset="0" stop-color="#F4FDFF" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#F4FDFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect x="16" y="16" width="224" height="224" rx="56" fill="url(#bg)"/>
+  <rect x="16" y="16" width="224" height="224" rx="56" fill="#FFFFFF" opacity="0.06"/>
+  <path d="M78 169L117 103L157 168" fill="none" stroke="#F4FDFF" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M153 132H189" stroke="#F4FDFF" stroke-width="15" stroke-linecap="round"/>
+  <circle cx="178" cy="88" r="11" fill="#F4FDFF"/>
+  <path d="M117 103L147 64L177 103" fill="url(#beam)" opacity="0.86"/>
+</svg>

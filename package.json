@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:extension": "vite --config vite.extension.config.js",
     "build": "tsc && vite build",
+    "prebuild:extension": "node scripts/prepare-extension-assets.mjs",
+    "build:extension": "vite build --config vite.extension.config.js",
     "preview": "vite preview"
   },
   "dependencies": {
