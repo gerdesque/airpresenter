@@ -1,0 +1,16 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">AirPresenter neon favicon</title>
+  <desc id="desc">Neon gradient AirPresenter favicon.</desc>
+  <defs>
+    <linearGradient id="bg" x1="22" y1="22" x2="234" y2="234" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF4A7D"/>
+      <stop offset="0.48" stop-color="#7A47FF"/>
+      <stop offset="1" stop-color="#31E1FF"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="224" height="224" rx="56" fill="url(#bg)"/>
+  <rect x="16" y="16" width="224" height="224" rx="56" fill="#FFFFFF" opacity="0.1"/>
+  <path d="M78 169L117 101L159 169" fill="none" stroke="#FFFFFF" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M154 131H191" stroke="#D9F8FF" stroke-width="15" stroke-linecap="round"/>
+  <circle cx="179" cy="87" r="11" fill="#D9F8FF"/>
+</svg>

@@ -1,0 +1,20 @@
+<svg width="980" height="260" viewBox="0 0 980 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">AirPresenter minimal logo</title>
+  <desc id="desc">Minimal geometric AirPresenter logo optimized for clean UI environments.</desc>
+  <defs>
+    <linearGradient id="panel" x1="38" y1="28" x2="196" y2="204" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2B66FF"/>
+      <stop offset="1" stop-color="#34D8FF"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(12 14)">
+    <rect x="8" y="8" width="204" height="204" rx="52" fill="#101B32"/>
+    <rect x="44" y="44" width="132" height="132" rx="30" fill="url(#panel)"/>
+    <path d="M76 146L104 92L132 146" fill="none" stroke="#EAF5FF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M128 116H154" stroke="#EAF5FF" stroke-width="11" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(258 45)">
+    <text x="0" y="92" font-family="Montserrat, Segoe UI, sans-serif" font-size="92" font-weight="700" fill="#0F1D35">AirPresenter</text>
+    <text x="2" y="146" font-family="Manrope, Segoe UI, sans-serif" font-size="30" font-weight="600" fill="#3D5E8F" letter-spacing="3.4">GESTURE NAVIGATION</text>
+  </g>
+</svg>

@@ -1,0 +1,28 @@
+<svg width="980" height="260" viewBox="0 0 980 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">AirPresenter beam logo</title>
+  <desc id="desc">Luminous badge with a projector beam and dynamic AirPresenter wordmark.</desc>
+  <defs>
+    <linearGradient id="badgeGlow" x1="24" y1="18" x2="220" y2="220" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#073BFF"/>
+      <stop offset="0.42" stop-color="#00AFFF"/>
+      <stop offset="1" stop-color="#6BFFD7"/>
+    </linearGradient>
+    <radialGradient id="beam" cx="0.52" cy="0.5" r="0.8">
+      <stop offset="0" stop-color="#E7F9FF" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#E7F9FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g transform="translate(12 14)">
+    <rect x="8" y="8" width="204" height="204" rx="52" fill="url(#badgeGlow)"/>
+    <rect x="8" y="8" width="204" height="204" rx="52" fill="#FFFFFF" opacity="0.06"/>
+    <path d="M62 138L104 78L146 138" fill="none" stroke="#F4FDFF" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M143 103H178" stroke="#F4FDFF" stroke-width="13" stroke-linecap="round"/>
+    <circle cx="168" cy="74" r="10" fill="#F4FDFF"/>
+    <path d="M168 56V45M168 103V92M183 74H194M142 74H153" stroke="#F4FDFF" stroke-width="5.5" stroke-linecap="round"/>
+    <path d="M103 78L130 43L157 78" fill="url(#beam)" opacity="0.88"/>
+  </g>
+  <g transform="translate(258 45)">
+    <text x="0" y="92" font-family="Poppins, Montserrat, Segoe UI, sans-serif" font-size="94" font-weight="800" fill="#081B3A">AirPresenter</text>
+    <text x="2" y="146" font-family="Manrope, Segoe UI, sans-serif" font-size="31" font-weight="700" fill="#245188" letter-spacing="4.8">CONTROL IN MID-AIR</text>
+  </g>
+</svg>
