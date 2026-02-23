@@ -1,3 +1,3 @@
 export default {
-  base: 'airpresenter',
+  base: '/airpresenter',
 }
