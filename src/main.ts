@@ -22,15 +22,15 @@ app.innerHTML = `
       <canvas id="pdfCanvas"></canvas>
       <canvas id="pointerCanvas"></canvas>
       <div class="fx-layer" id="fxLayer" aria-hidden="true"></div>
-      <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="PDF ablegen oder auswählen">
-        <div class="dropTitle">PDF ablegen</div>
-        <div class="dropHint">oder klicken zum Auswählen</div>
+      <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Präsentation laden">
+        <div class="dropTitle">Präsentation laden</div>
+        <div class="dropHint">PDF hier ablegen oder klicken zum Auswählen</div>
       </div>
     </div>
 
     <div class="topbar">
       <div class="brand">
-        <button class="iconBtn" id="settingsBtn" aria-label="Einstellungen">
+        <button class="iconBtn" id="settingsBtn" aria-label="Einstellungen" aria-expanded="false">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" stroke="currentColor" stroke-width="1.8"/>
             <path d="M19.4 12a7.7 7.7 0 0 0-.1-1.2l2-1.6-1.9-3.3-2.5 1a7.8 7.8 0 0 0-2.1-1.2l-.4-2.7H9.6l-.4 2.7c-.7.3-1.4.7-2.1 1.2l-2.5-1-1.9 3.3 2 1.6A7.7 7.7 0 0 0 4.6 12c0 .4 0 .8.1 1.2l-2 1.6 1.9 3.3 2.5-1c.7.5 1.4.9 2.1 1.2l.4 2.7h4.8l.4-2.7c.7-.3 1.4-.7 2.1-1.2l2.5 1 1.9-3.3-2-1.6c.1-.4.1-1.2.1-1.2Z" stroke="currentColor" stroke-width="1.2" opacity="0.9"/>
@@ -38,14 +38,12 @@ app.innerHTML = `
         </button>
         <div>
           <div class="brandTitle">AirPresenter</div>
-          <div class="small" style="color:rgba(255,255,255,0.68);font-size:12px;">
-            Tippen=Weiter - Doppeltippen=Zurück - Halten+Ziehen=Laser - ❤️/✌️/🤘︎
-          </div>
+          <div class="brandSubline">Tap = Weiter | Double Tap = Zurück | Hold + Drag = Laserpointer</div>
         </div>
       </div>
 
       <div class="pill" id="pagePill">Keine PDF geladen</div>
-      <div class="pill" id="statusPill">Start...</div>
+      <div class="pill" id="statusPill">Kamera wird gestartet...</div>
     </div>
 
     <div class="drawer" id="drawer" aria-label="Einstellungen">
@@ -56,8 +54,8 @@ app.innerHTML = `
         <button id="next" disabled>Weiter</button>
       </div>
 
-      <div style="margin-top:10px;color:rgba(255,255,255,0.62);font-size:12px;">
-        Tastatur-Alternative: <kbd>-&gt;</kbd> / <kbd>&lt;-</kbd> / <kbd>Leertaste</kbd>
+      <div class="helpText">
+        Tastatur: <kbd>Pfeil rechts</kbd> / <kbd>Pfeil links</kbd> / <kbd>Leertaste</kbd>
       </div>
 
       <hr/>
@@ -122,7 +120,6 @@ const fxLayerEl = getEl<HTMLDivElement>("#fxLayer");
 const videoEl = getEl<HTMLVideoElement>("#video");
 const handsCanvasEl = getEl<HTMLCanvasElement>("#handsCanvas");
 const cameraOrbEl = getEl<HTMLDivElement>("#cameraOrb");
-//const cameraLabelEl = getEl<HTMLDivElement>("#cameraLabel");
 
 const drawer = getEl<HTMLDivElement>("#drawer");
 const settingsBtn = getEl<HTMLButtonElement>("#settingsBtn");
@@ -132,9 +129,23 @@ const prevBtn = getEl<HTMLButtonElement>("#prev");
 const nextBtn = getEl<HTMLButtonElement>("#next");
 const debugEl = getEl<HTMLDivElement>("#debug");
 
-settingsBtn.addEventListener("click", () => drawer.classList.toggle("open"));
+settingsBtn.addEventListener("click", () => {
+  const isOpen = drawer.classList.toggle("open");
+  settingsBtn.setAttribute("aria-expanded", String(isOpen));
+});
+window.addEventListener("pointerdown", (e) => {
+  const target = e.target as Node | null;
+  if (!target) return;
+  if (!drawer.classList.contains("open")) return;
+  if (drawer.contains(target) || settingsBtn.contains(target)) return;
+  drawer.classList.remove("open");
+  settingsBtn.setAttribute("aria-expanded", "false");
+});
 window.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") drawer.classList.remove("open");
+  if (e.key === "Escape") {
+    drawer.classList.remove("open");
+    settingsBtn.setAttribute("aria-expanded", "false");
+  }
 });
 
 const pdf = createPdfViewer({
@@ -184,7 +195,7 @@ function spawnFxNode(className: string, x: number, y: number, style: Record<stri
 function spawnHeart(nx?: number | null, ny?: number | null) {
   const { x, y } = getFxPosition(nx, ny);
   const node = spawnFxNode("fx-heart", x, y);
-  setTimeout(() => node.remove(), 900);
+  setTimeout(() => node.remove(), 1150);
 }
 
 function spawnSparkBurst(nx?: number | null, ny?: number | null, hue = 46) {
@@ -200,7 +211,7 @@ function spawnSparkBurst(nx?: number | null, ny?: number | null, hue = 46) {
       "--dy": `${dy}px`,
       "--hue": String(hue + Math.floor(Math.random() * 25)),
     });
-    setTimeout(() => node.remove(), 900);
+    setTimeout(() => node.remove(), 1500);
   }
 }
 
@@ -218,7 +229,7 @@ function spawnConfetti(nx?: number | null, ny?: number | null) {
       "--rot": `${Math.random() * 260 - 130}deg`,
       "--hue": String(Math.floor(Math.random() * 360)),
     });
-    setTimeout(() => node.remove(), 1200);
+    setTimeout(() => node.remove(), 1350);
   }
 }
 
@@ -242,12 +253,12 @@ fileEl.addEventListener("change", async (e) => {
 
 async function loadPdfFile(file: File) {
   if (file.type !== "application/pdf") {
-    alert("Bitte eine PDF auswaehlen.");
+    alert("Bitte eine PDF auswählen.");
     return;
   }
   statusPill.textContent = "PDF wird geladen...";
   await pdf.loadFromFile(file);
-  statusPill.textContent = "Bereit";
+  statusPill.textContent = "Bereit für Gesten";
 }
 
 function isFileDrag(evt: DragEvent) {
@@ -408,4 +419,3 @@ const tracker = await createHandTracker({
 
 await tracker.start();
 cameraOrbEl.classList.add("is-active");
-//cameraLabelEl.textContent = "Kamera aktiv";
