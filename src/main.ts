@@ -38,7 +38,7 @@ app.innerHTML = `
         </button>
         <div>
           <div class="brandTitle">AirPresenter</div>
-          <div class="brandSubline">Tap = Weiter | Double Tap = Zurück | Hold + Drag = Laserpointer</div>
+          <div class="brandSubline">Woosh rechts = Weiter | Woosh links = Zurück | Hold + Drag = Laserpointer</div>
         </div>
       </div>
 
@@ -81,7 +81,7 @@ app.innerHTML = `
       </div>
 
       <div class="kv">
-        <label for="cooldown">Tap-Pause</label>
+        <label for="cooldown">Woosh-Pause</label>
         <input id="cooldown" type="range" min="200" max="900" step="10" />
         <div class="v" id="cooldownV"></div>
       </div>
@@ -313,9 +313,10 @@ const tuning: GestureConfig = {
   pinchUpFrames: DEFAULTS.pinchUpFrames,
   holdMs: DEFAULTS.holdMs,
   dragDeadzone: DEFAULTS.dragDeadzone,
-  doubleTapWindowMs: DEFAULTS.doubleTapWindowMs,
-  tapCooldownMs: DEFAULTS.tapCooldownMs,
-  maxTapDurationMs: DEFAULTS.maxTapDurationMs,
+  swipeCooldownMs: DEFAULTS.swipeCooldownMs,
+  swipeWindowMs: DEFAULTS.swipeWindowMs,
+  swipeMinDistance: DEFAULTS.swipeMinDistance,
+  swipeMaxVerticalDrift: DEFAULTS.swipeMaxVerticalDrift,
 };
 
 const pinchDownEl = getEl<HTMLInputElement>("#pinchDown");
@@ -334,13 +335,13 @@ function syncUI() {
   pinchDownEl.value = String(tuning.pinchThresholdDown);
   pinchUpEl.value = String(tuning.pinchThresholdUp);
   holdEl.value = String(tuning.holdMs);
-  cooldownEl.value = String(tuning.tapCooldownMs);
+  cooldownEl.value = String(tuning.swipeCooldownMs);
   deadzoneEl.value = String(tuning.dragDeadzone);
 
   pinchDownV.textContent = tuning.pinchThresholdDown.toFixed(3);
   pinchUpV.textContent = tuning.pinchThresholdUp.toFixed(3);
   holdV.textContent = String(tuning.holdMs);
-  cooldownV.textContent = String(tuning.tapCooldownMs);
+  cooldownV.textContent = String(tuning.swipeCooldownMs);
   deadzoneV.textContent = tuning.dragDeadzone.toFixed(3);
 }
 syncUI();
@@ -354,10 +355,10 @@ const gestures = createGestureEngine({
     const loaded = st.loaded;
 
     switch (evt.type) {
-      case "tap":
+      case "woosh_right":
         if (loaded) await pdf.next();
         break;
-      case "double_tap":
+      case "woosh_left":
         if (loaded) await pdf.prev();
         break;
       case "hold_start":
@@ -405,7 +406,7 @@ function attachSlider<K extends keyof GestureConfig>(
 attachSlider(pinchDownEl, "pinchThresholdDown", Number);
 attachSlider(pinchUpEl, "pinchThresholdUp", Number);
 attachSlider(holdEl, "holdMs", Number);
-attachSlider(cooldownEl, "tapCooldownMs", Number);
+attachSlider(cooldownEl, "swipeCooldownMs", Number);
 attachSlider(deadzoneEl, "dragDeadzone", Number);
 
 const tracker = await createHandTracker({

@@ -3,9 +3,10 @@ export type Defaults = {
   pinchThresholdUp: number;
   pinchDownFrames: number;
   pinchUpFrames: number;
-  doubleTapWindowMs: number;
-  tapCooldownMs: number;
-  maxTapDurationMs: number;
+  swipeCooldownMs: number;
+  swipeWindowMs: number;
+  swipeMinDistance: number;
+  swipeMaxVerticalDrift: number;
   holdMs: number;
   dragDeadzone: number;
   pointerRadiusPx: number;

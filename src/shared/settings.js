@@ -8,10 +8,11 @@ export const DEFAULTS = {
   pinchDownFrames: 3,
   pinchUpFrames: 2,
 
-  // Tap behavior
-  doubleTapWindowMs: 320,
-  tapCooldownMs: 450,
-  maxTapDurationMs: 220,
+  // Swipe behavior
+  swipeCooldownMs: 420,
+  swipeWindowMs: 430,
+  swipeMinDistance: 0.11,
+  swipeMaxVerticalDrift: 0.075,
 
   // Hold / pointer
   holdMs: 340,

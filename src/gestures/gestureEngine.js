@@ -12,12 +12,16 @@ const IDX = {
   MIDDLE_MCP: 9,
 };
 
+const SWIPE_TRIGGER_DELAY_MS = 140;
+const SWIPE_REARM_CENTER_MIN_X = 0.42;
+const SWIPE_REARM_CENTER_MAX_X = 0.58;
+
 /**
  * GestureEngine: webcam-friendly, presenter-safe
  * - Pinch with hysteresis (down/up thresholds) to avoid flicker
  * - Require stable frames for pinch down/up
- * - Tap is delayed until the double-tap window expires (fixes single-then-double issue)
- * - Cooldown prevents accidental rapid taps
+ * - Horizontal woosh swipe (left/right) for slide navigation
+ * - Cooldown prevents accidental rapid repeated swipes
  */
 export function createGestureEngine({
   pinchThresholdDown = 0.034,
@@ -28,9 +32,10 @@ export function createGestureEngine({
   holdMs = 340,
   dragDeadzone = 0.005,
 
-  doubleTapWindowMs = 320,
-  tapCooldownMs = 450,
-  maxTapDurationMs = 220,
+  swipeCooldownMs = 420,
+  swipeWindowMs = 430,
+  swipeMinDistance = 0.11,
+  swipeMaxVerticalDrift = 0.075,
 
   // fun gesture tuning
   funGestureCooldownMs = 1400,
@@ -53,9 +58,10 @@ export function createGestureEngine({
     pinchUpFrames,
     holdMs,
     dragDeadzone,
-    doubleTapWindowMs,
-    tapCooldownMs,
-    maxTapDurationMs,
+    swipeCooldownMs,
+    swipeWindowMs,
+    swipeMinDistance,
+    swipeMaxVerticalDrift,
 
     funGestureCooldownMs,
     fingerExtendSlack,
@@ -79,11 +85,11 @@ export function createGestureEngine({
     upCount: 0,
     pinchingLogical: false,
 
-    // tap handling
-    tapTimer: null,
-    lastTapAt: -1,
-    pendingTapAt: -1,
-    lastTapDuration: 0,
+    // swipe handling
+    swipeStartPos: null,
+    swipeStartMs: -1,
+    lastSwipeAt: -1,
+    swipeLockedUntilCenter: false,
 
     // fun gesture cooldowns + stability
     confettiCount: 0,
@@ -205,52 +211,62 @@ export function createGestureEngine({
     return true;
   }
 
-  function clearTapTimer() {
-    if (state.tapTimer) {
-      clearTimeout(state.tapTimer);
-      state.tapTimer = null;
-    }
+  function resetSwipeState() {
+    state.swipeStartPos = null;
+    state.swipeStartMs = -1;
   }
 
-  function commitSingleTap() {
-    emit("tap", { durationMs: state.lastTapDuration });
-    state.pendingTapAt = -1;
-    state.tapTimer = null;
-  }
-
-  function registerTap(tapDurationMs) {
-    const now = performance.now();
-
-    if (tapDurationMs > cfg.maxTapDurationMs) {
-      emit("tap_rejected", { reason: "too_long", durationMs: tapDurationMs });
+  function maybeEmitSwipe(hand, now) {
+    if (state.phase !== "IDLE") {
+      resetSwipeState();
       return;
     }
 
-    if (state.lastTapAt > 0 && now - state.lastTapAt < cfg.tapCooldownMs) {
-      emit("tap_rejected", { reason: "cooldown" });
-      return;
-    }
+    const palmPos = getPalmCenter(hand);
+    const inRearmCenterBand =
+      palmPos.x >= SWIPE_REARM_CENTER_MIN_X && palmPos.x <= SWIPE_REARM_CENTER_MAX_X;
 
-    // second tap inside window => double tap
-    if (state.pendingTapAt > 0 && now - state.pendingTapAt <= cfg.doubleTapWindowMs) {
-      clearTapTimer();
-      state.pendingTapAt = -1;
-      state.lastTapAt = now;
-      state.lastTapDuration = tapDurationMs;
-      emit("double_tap", { durationMs: tapDurationMs });
-      return;
-    }
-
-    // first tap => pending
-    clearTapTimer();
-    state.pendingTapAt = now;
-    state.lastTapDuration = tapDurationMs;
-    state.tapTimer = setTimeout(() => {
-      if (state.pendingTapAt > 0) {
-        state.lastTapAt = performance.now();
-        commitSingleTap();
+    if (state.swipeLockedUntilCenter) {
+      if (inRearmCenterBand) {
+        state.swipeLockedUntilCenter = false;
+        state.swipeStartPos = palmPos;
+        state.swipeStartMs = now;
       }
-    }, cfg.doubleTapWindowMs + 10);
+      return;
+    }
+
+    if (!state.swipeStartPos || state.swipeStartMs < 0) {
+      state.swipeStartPos = palmPos;
+      state.swipeStartMs = now;
+      return;
+    }
+
+    const elapsed = now - state.swipeStartMs;
+    const dx = palmPos.x - state.swipeStartPos.x;
+    const dy = palmPos.y - state.swipeStartPos.y;
+
+    if (elapsed > cfg.swipeWindowMs || Math.abs(dy) > cfg.swipeMaxVerticalDrift * 1.5) {
+      state.swipeStartPos = palmPos;
+      state.swipeStartMs = now;
+      return;
+    }
+
+    const inCooldown = state.lastSwipeAt > 0 && now - state.lastSwipeAt < cfg.swipeCooldownMs;
+    if (inCooldown) return;
+    if (elapsed < SWIPE_TRIGGER_DELAY_MS) return;
+    if (Math.abs(dx) < cfg.swipeMinDistance || Math.abs(dy) > cfg.swipeMaxVerticalDrift) return;
+
+    state.lastSwipeAt = now;
+    // Hand tracking X is mirrored vs perceived screen direction, so flip labels.
+    emit(dx > 0 ? "woosh_left" : "woosh_right", {
+      dx,
+      dy,
+      durationMs: elapsed,
+      x: palmPos.x,
+      y: palmPos.y,
+    });
+    state.swipeLockedUntilCenter = true;
+    resetSwipeState();
   }
 
   function logicalPinchUpdate(pinchD) {
@@ -295,9 +311,7 @@ export function createGestureEngine({
     if (!hand) {
       if (state.phase !== "IDLE") emit("hand_lost", { from: state.phase });
       resetPinchStability();
-      clearTapTimer();
-      state.pendingTapAt = -1;
-      state.lastTapAt = -1;
+      resetSwipeState();
       clearFunCounts();
       state.phase = "IDLE";
       return;
@@ -307,6 +321,12 @@ export function createGestureEngine({
     const pinching = logicalPinchUpdate(pinchD);
     const pos = getCursorPos(hand);
     const now = performance.now();
+
+    if (!pinching) {
+      maybeEmitSwipe(hand, now);
+    } else {
+      resetSwipeState();
+    }
 
     if (state.phase === "IDLE" && !pinching) {
       const palmPos = getPalmCenter(hand);
@@ -378,7 +398,6 @@ export function createGestureEngine({
         state.phase = "IDLE";
         state.pinchStartMs = 0;
         state.lastPos = null;
-        registerTap(tapDurationMs);
         return;
       }
 

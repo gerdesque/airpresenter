@@ -24,9 +24,11 @@ const POINTER_SMOOTHING = 0.3;
 
 const PINCH_THRESHOLD_DOWN = 0.048;
 const PINCH_THRESHOLD_UP = 0.062;
-const PINCH_DOWN_FRAMES = 1;
-const PINCH_UP_FRAMES = 1;
-const CLICK_COOLDOWN_MS = 260;
+const PINCH_DOWN_FRAMES = 2;
+const PINCH_UP_FRAMES = 2;
+const CLICK_COOLDOWN_MS = 320;
+const CLICK_STABILIZE_MS = 55;
+const CLICK_MAX_POINTER_DRIFT = 0.012;
 
 const WASM_BASE_URL = chrome.runtime.getURL("mediapipe/wasm");
 const MODEL_ASSET_PATH =
@@ -66,6 +68,10 @@ let pinchingLogical = false;
 let pinchDownCount = 0;
 let pinchUpCount = 0;
 let lastClickAt = -1;
+let pinchStartedAt = -1;
+let pinchStartPointerX = null;
+let pinchStartPointerY = null;
+let pinchClickSent = false;
 
 let cachedTargetTabId = null;
 let cachedTargetTabUrl = null;
@@ -285,13 +291,11 @@ function updatePinchAndClick(hand, pointer, now) {
       if (pinchDownCount >= PINCH_DOWN_FRAMES) {
         pinchingLogical = true;
         pinchDownCount = 0;
+        pinchStartedAt = now;
+        pinchStartPointerX = pointer?.x ?? null;
+        pinchStartPointerY = pointer?.y ?? null;
+        pinchClickSent = false;
         setDiag("pinch", "closed");
-
-        if (pointer && (lastClickAt < 0 || now - lastClickAt >= CLICK_COOLDOWN_MS)) {
-          lastClickAt = now;
-          setEvent("Pinch click");
-          void sendPointerClick(pointer.x, pointer.y);
-        }
       }
     } else {
       pinchDownCount = 0;
@@ -301,6 +305,20 @@ function updatePinchAndClick(hand, pointer, now) {
   }
 
   pinchDownCount = 0;
+  if (!pinchClickSent && pointer) {
+    const inCooldown = lastClickAt >= 0 && now - lastClickAt < CLICK_COOLDOWN_MS;
+    const stableLongEnough = pinchStartedAt >= 0 && now - pinchStartedAt >= CLICK_STABILIZE_MS;
+    const driftX = pinchStartPointerX == null ? 0 : Math.abs(pointer.x - pinchStartPointerX);
+    const driftY = pinchStartPointerY == null ? 0 : Math.abs(pointer.y - pinchStartPointerY);
+    const stablePointer = driftX + driftY <= CLICK_MAX_POINTER_DRIFT;
+    if (!inCooldown && stableLongEnough && stablePointer) {
+      pinchClickSent = true;
+      lastClickAt = now;
+      setEvent("Pinch click");
+      void sendPointerClick(pointer.x, pointer.y);
+    }
+  }
+
   if (pinchDistance > PINCH_THRESHOLD_UP) {
     pinchUpCount += 1;
     if (pinchUpCount >= PINCH_UP_FRAMES) {
@@ -357,6 +375,10 @@ function resetPinchState() {
   pinchingLogical = false;
   pinchDownCount = 0;
   pinchUpCount = 0;
+  pinchStartedAt = -1;
+  pinchStartPointerX = null;
+  pinchStartPointerY = null;
+  pinchClickSent = false;
   setDiag("pinch", "open");
 }
 

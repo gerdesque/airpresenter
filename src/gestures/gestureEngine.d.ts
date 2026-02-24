@@ -7,15 +7,14 @@ export type GestureConfig = {
   pinchUpFrames: number;
   holdMs: number;
   dragDeadzone: number;
-  doubleTapWindowMs: number;
-  tapCooldownMs: number;
-  maxTapDurationMs: number;
+  swipeCooldownMs: number;
+  swipeWindowMs: number;
+  swipeMinDistance: number;
+  swipeMaxVerticalDrift: number;
 };
 
 export type GestureEvent =
-  | { type: "tap"; t: number; durationMs?: number }
-  | { type: "double_tap"; t: number; durationMs?: number }
-  | { type: "tap_rejected"; t: number; reason: "too_long" | "cooldown"; durationMs?: number }
+  | { type: "woosh_left" | "woosh_right"; t: number; durationMs?: number; dx?: number; dy?: number; x?: number; y?: number }
   | { type: "pinch_down"; t: number; pinchD?: number }
   | { type: "pinch_up"; t: number; kind: "tap" | "release"; pinchD?: number; durationMs?: number }
   | { type: "hold_start"; t: number }

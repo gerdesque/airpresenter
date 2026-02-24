@@ -109,10 +109,10 @@
   }
 
   function dispatchSyntheticClick(clientX, clientY) {
-    const target = document.elementFromPoint(clientX, clientY);
+    const target = resolveClickTarget(clientX, clientY);
     if (!target || target === cursorEl) return;
 
-    const pointerInit = {
+    const pointerDownInit = {
       bubbles: true,
       cancelable: true,
       composed: true,
@@ -126,7 +126,12 @@
       view: window,
     };
 
-    const mouseInit = {
+    const pointerUpInit = {
+      ...pointerDownInit,
+      buttons: 0,
+    };
+
+    const mouseDownInit = {
       bubbles: true,
       cancelable: true,
       composed: true,
@@ -134,23 +139,50 @@
       clientY,
       button: 0,
       buttons: 1,
+      detail: 1,
+      view: window,
+    };
+
+    const mouseUpInit = {
+      ...mouseDownInit,
+      buttons: 0,
+    };
+
+    const mouseClickInit = {
+      ...mouseDownInit,
+      buttons: 0,
       view: window,
     };
 
     if (typeof PointerEvent === "function") {
-      target.dispatchEvent(new PointerEvent("pointerdown", pointerInit));
+      target.dispatchEvent(new PointerEvent("pointerdown", pointerDownInit));
     }
-    target.dispatchEvent(new MouseEvent("mousedown", mouseInit));
+    target.dispatchEvent(new MouseEvent("mousedown", mouseDownInit));
 
     if (typeof PointerEvent === "function") {
-      target.dispatchEvent(new PointerEvent("pointerup", pointerInit));
+      target.dispatchEvent(new PointerEvent("pointerup", pointerUpInit));
     }
-    target.dispatchEvent(new MouseEvent("mouseup", mouseInit));
-    target.dispatchEvent(new MouseEvent("click", mouseInit));
+    target.dispatchEvent(new MouseEvent("mouseup", mouseUpInit));
+    target.dispatchEvent(new MouseEvent("click", mouseClickInit));
 
     if (target instanceof HTMLElement) {
       target.focus({ preventScroll: true });
     }
+  }
+
+  function resolveClickTarget(clientX, clientY) {
+    const stack = document.elementsFromPoint(clientX, clientY);
+    if (!Array.isArray(stack) || stack.length === 0) return null;
+
+    for (const el of stack) {
+      if (!(el instanceof Element) || el === cursorEl) continue;
+      const interactive = el.closest(
+        "button, a[href], input, select, textarea, label, summary, [role='button'], [role='link'], [tabindex]:not([tabindex='-1'])",
+      );
+      if (interactive && interactive !== cursorEl) return interactive;
+      return el;
+    }
+    return null;
   }
 
   function clamp01(value) {
